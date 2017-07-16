@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -48,5 +49,21 @@ public class JsonHelper {
         String []resultStringArray = new String[list.size()];
         list.toArray(resultStringArray);
         return resultStringArray;
+    }
+    
+    /**
+	 * Convert json to java object
+	 */
+    public static <T> T convertToJavaObject(String json, Class<T> classOf){
+    	Gson gson = new Gson();
+    	T object =  gson.fromJson(json, classOf);
+    	return object;
+    }
+    
+    /**
+	 * Convert java object to json format
+	 */
+    public static <T> String convertToJson(T object){
+    	return new Gson().toJson(object);
     }
 }

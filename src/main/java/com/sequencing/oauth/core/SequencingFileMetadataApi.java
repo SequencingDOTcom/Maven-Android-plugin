@@ -18,4 +18,10 @@ public interface SequencingFileMetadataApi {
 	 * @return String json of file content
 	 */
 	public String getOwnFiles() throws NonAuthorizedException;
+	
+	/**
+	 * Returns all files from sequencing.com
+	 * @return String json of file content
+	 */
+	public String getFiles() throws NonAuthorizedException;
 }

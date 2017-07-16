@@ -26,6 +26,12 @@ public class DefaultSequencingFileMetadataApi implements SequencingFileMetadataA
         return getFilesByType("uploaded");
     }
 	
+	@Override
+	public String getFiles() throws NonAuthorizedException 
+	{
+		return getFilesByType("all");
+	}
+	
 	/**
 	 * Returns files depending on file type
 	 */
@@ -35,7 +41,7 @@ public class DefaultSequencingFileMetadataApi implements SequencingFileMetadataA
             throw new NonAuthorizedException();
         }
 		
-        String uri = String.format("%s/DataSourceList?%s=true&shared=true", 
+        String uri = String.format("%s/DataSourceList?%s=true", 
         		client.getAuthenticationParameters().getApiUri(), fileType);
         
         return HttpHelper.doOauthSecureGet(uri, client.getToken());

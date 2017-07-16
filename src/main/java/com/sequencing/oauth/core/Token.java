@@ -1,6 +1,7 @@
 package com.sequencing.oauth.core;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Class that defines token attributes needed for making data 
@@ -24,11 +25,17 @@ public class Token implements Serializable
 	 * Access token lifetime
 	 */
 	private long lifetime = 0;
+	
+	/**
+	 * Last date of token refreshing
+	 */
+	private Date lastRefreshDate;
 
-	public Token(String accessToken, String refreshToken, long lifetime) {
+	public Token(String accessToken, String refreshToken, long lifetime, Date lastRefreshDate) {
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
 		this.lifetime = lifetime;
+		this.lastRefreshDate = lastRefreshDate;
 	}
 	
 	public String getAccessToken() {
@@ -41,5 +48,9 @@ public class Token implements Serializable
 
 	public long getLifeTime() {
 		return lifetime;
+	}
+
+	public Date getLastRefreshDate() {
+		return lastRefreshDate;
 	}
 }

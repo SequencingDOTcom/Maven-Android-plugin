@@ -2,13 +2,11 @@ package com.sequencing.oauth.core;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ import com.sequencing.oauth.helper.JsonHelper;
  */
 public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Serializable
 {
-	private static final long serialVersionUID = 367801346184616920L;
+	private static final long serialVersionUID = -1085956585099205527L;
 	private AuthenticationParameters parameters;
 	private volatile Token token;
 	
@@ -83,9 +81,9 @@ public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Se
 	private static final String ATTR_EXPRIES_IN = "expires_in";
 	
 	/**
-	 * Executor that handles token refresh
+	 * Attribute for value mobile mode
 	 */
-	private ScheduledExecutorService tokenUpdateExecutor = Executors.newSingleThreadScheduledExecutor();
+	private static final String ATTR_MOBILE_MODE = "mobile";
 	
 	public DefaultSequencingOAuth2Client(AuthenticationParameters parameters){
 		this.parameters = parameters;
@@ -99,6 +97,7 @@ public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Se
 		attribures.put(ATTR_STATE, parameters.getState());
 		attribures.put(ATTR_CLIENT_ID, parameters.getClientId());
 		attribures.put(ATTR_SCOPE, parameters.getScope());
+		attribures.put(ATTR_MOBILE_MODE, parameters.getMobileMode());
 		return attribures;
 	}
 	
@@ -134,9 +133,7 @@ public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Se
 		String refreshToken = JsonHelper.getField(result, ATTR_REFRESH_TOKEN);
 		long timelife = Long.parseLong(JsonHelper.getField(result, ATTR_EXPRIES_IN));
 			
-		token = new Token(accessToken, refreshToken, timelife);
-		
-		runRefreshTokenExecutor();
+		token = new Token(accessToken, refreshToken, timelife, new Date());
 		
 		return token;
 	}
@@ -154,6 +151,14 @@ public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Se
 
 	@Override
 	public Token getToken() {
+		if(System.currentTimeMillis() >= (token.getLastRefreshDate().getTime() + (token.getLifeTime() * 1000) - 30000) && isAuthorized()){
+			try {
+				refreshToken();
+			} catch (BasicAuthenticationFailedException e) {
+				log.debug("Error occured during refresh token", e.getMessage());
+			}
+		}
+		
 		return token;
 	}
 
@@ -176,26 +181,8 @@ public class DefaultSequencingOAuth2Client implements SequencingOAuth2Client, Se
 		String accessToken = JsonHelper.getField(result, ATTR_ACCESS_TOKEN);
 		long timelife = Long.parseLong(JsonHelper.getField(result, ATTR_EXPRIES_IN));
 		
-		token = new Token(accessToken, token.getRefreshToken(), timelife);
-		log.debug("Token has been refreshed. New token value " + token.getAccessToken());
-	}
-	
-	/**
-	 * Runs executor for refreshing token 
-	 */
-	private void runRefreshTokenExecutor() {
-		tokenUpdateExecutor.scheduleWithFixedDelay(new TokenRefreshTask(), 0, token.getLifeTime() - 60, TimeUnit.SECONDS);
-	}
-	
-	class TokenRefreshTask implements Runnable
-	{
-		public void run() {
-			try {
-				refreshToken();
-			} catch (BasicAuthenticationFailedException e) {
-				log.debug("Error occured during refresh token", e.getMessage());
-			}
-		}
+		token = new Token(accessToken, token.getRefreshToken(), timelife, new Date());
+		log.info("Token has been refreshed. New token value " + token.getAccessToken());
 	}
 	
 	private List<String> getAttributesForRedirectAsList() {

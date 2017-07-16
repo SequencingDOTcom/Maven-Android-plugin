@@ -4,7 +4,7 @@
 	<groupId>com.sequencing</groupId>
 	<artifactId>oauth2-core</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0</version>
+	<version>1.9</version>
 
 	<name>Sequencing oAuth API</name>
 	<description>Module provides API access to sequencing.com backend</description>
@@ -35,10 +35,10 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.6</java.version>
+		<java.version>1.7</java.version>
 		<httpclient.version>4.4.1</httpclient.version>
 		<gson.version>2.5</gson.version>
-		<slf4j.version>1.7.12</slf4j.version>
+		<slf4j.version>1.7.18</slf4j.version>
 	</properties>
 
 	<dependencies>
@@ -133,6 +133,19 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+
 		</plugins>
 	</build>
 </project>

@@ -20,9 +20,10 @@ public class AuthenticationParameters implements Serializable
 	public static final String DEFAULT_TOKEN_URI = "https://sequencing.com/oauth2/token"; 
 	public static final String DEFAULT_API_URI = "https://api.sequencing.com"; 
 	public static final String DEFAULT_RESPONSE_TYPE = "code"; 
-	public static final String DEFAULT_SCOPE = "demo"; 
+	public static final String DEFAULT_SCOPE = "demo,external"; 
 	public static final String DEFAULT_GRANT_TYPE = "authorization_code";
 	public static final String DEFAULT_GRANT_TYPE_REFRESH = "refresh_token"; 
+	public static final String DEFAULT_MOBILE_MODE = "0"; 
 	
 	private static final Logger log = LoggerFactory.getLogger(AuthenticationParameters.class);
 
@@ -89,6 +90,11 @@ public class AuthenticationParameters implements Serializable
 	 * token.
 	 */
 	private final String grantTypeRefreshToken;
+	
+	/**
+	 * Sequencing login page mode. 1 - mobile mode, 0 - web mode.
+	 */
+	private final String mobileMode;
 
 	private AuthenticationParameters(ConfigurationBuilder builder) {
 		oAuthAuthorizationUri = builder.oAuthAuthorizationUri;
@@ -102,6 +108,8 @@ public class AuthenticationParameters implements Serializable
 		scope = builder.scope;
 		grantType = builder.grantType;
 		grantTypeRefreshToken = builder.grantTypeRefreshToken;
+		mobileMode = builder.mobileMode;
+		
 	}
 
 	public static class ConfigurationBuilder {
@@ -117,6 +125,7 @@ public class AuthenticationParameters implements Serializable
 		private String scope;
 		private String grantType;
 		private String grantTypeRefreshToken;
+		private String mobileMode;
 
 		public ConfigurationBuilder()
 		{
@@ -128,6 +137,7 @@ public class AuthenticationParameters implements Serializable
 				.withScope(DEFAULT_SCOPE)
 				.withGrantType(DEFAULT_GRANT_TYPE)
 				.withGrantTypeRefreshToken(DEFAULT_GRANT_TYPE_REFRESH)
+				.withMobileMode(DEFAULT_MOBILE_MODE)
 				.withState(nextState());
 		}
 
@@ -183,6 +193,11 @@ public class AuthenticationParameters implements Serializable
 
 		public ConfigurationBuilder withGrantTypeRefreshToken(String grantTypeRefreshToken) {
 			this.grantTypeRefreshToken = grantTypeRefreshToken;
+			return this;
+		}
+		
+		public ConfigurationBuilder withMobileMode(String mobileMode) {
+			this.mobileMode = mobileMode;
 			return this;
 		}
 
@@ -255,4 +270,8 @@ public class AuthenticationParameters implements Serializable
 	public String getGrantTypeRefreshToken() {
 		return grantTypeRefreshToken;
 	}
+
+	public String getMobileMode() {
+		return mobileMode;
+	}	
 }
